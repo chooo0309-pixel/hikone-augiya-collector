@@ -192,6 +192,34 @@ async def _find_all_units_link(page) -> str | None:
 
 
 async def _find_prev_day_url(page) -> str | None:
+    """前日レポートへのリンクを探す。
+
+    通常は「前日」という文字列のリンクだが、前日が休業日だった場合は
+    サイト側がリンクテキストを日付そのもの(例: '7/28')に変えてしまう
+    ことが確認されている。そのため文字列一致ではなく、
+    「翌日」リンクの直後(DOM順)に現れる、report_url形式
+    (https://min-repo.com/数字/)のリンクを前日リンクとして扱う。
+    この位置関係はテキストが「前日」でも日付表記でも変わらない。
+    """
+    href = await page.evaluate(
+        """() => {
+            const anchors = Array.from(document.querySelectorAll('a'));
+            const idx = anchors.findIndex(a => (a.textContent || '').trim() === '\u7fcc\u65e5');
+            if (idx === -1) return null;
+            const pattern = /^https:\\/\\/min-repo\\.com\\/\\d+\\/?$/;
+            for (let i = idx + 1; i < anchors.length; i++) {
+                const href = anchors[i].href;
+                if (href && pattern.test(href)) {
+                    return href;
+                }
+            }
+            return null;
+        }"""
+    )
+    if href:
+        return href
+
+    # フォールバック: 従来通り「前日」という文字列のリンクを探す
     candidates = page.locator("a:has-text('前日')")
     count = await candidates.count()
     if count == 0:
