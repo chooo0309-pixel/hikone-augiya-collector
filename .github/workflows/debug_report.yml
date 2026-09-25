@@ -18,6 +18,12 @@ jobs:
         run: |
           pip install -r requirements.txt
           playwright install --with-deps chromium
+     
+      - name: List files (確認用)
+        run: |
+          pwd
+          ls -la
+          ls -la collector
 
       - name: Run debug script
         run: python -m collector.debug_report
