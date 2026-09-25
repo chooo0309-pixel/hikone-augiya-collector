@@ -24,6 +24,12 @@ jobs:
           pwd
           ls -la
           ls -la collector
+          
+      - name: Python import test (確認用)
+        run: |
+          python -c "import sys; print(sys.path)"
+          python -c "import collector; print(collector.__file__)"
+          python -c "import collector.debug_report"
 
       - name: Run debug script
         run: python -m collector.debug_report
