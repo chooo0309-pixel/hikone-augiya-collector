@@ -1,0 +1,30 @@
+name: Debug Links (指定ページのリンク一覧)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "調査したいページのURL"
+        required: true
+        default: "https://min-repo.com/3258573/"
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TARGET_URL: ${{ inputs.target_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
+
+      - name: Run debug script
+        run: python -m collector.debug_links
