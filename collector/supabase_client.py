@@ -24,8 +24,9 @@ REBUILD_HISTORY_RPC = "rebuild_hikone_augiya_machine_history"
 
 class SupabaseClient:
     def __init__(self) -> None:
-        url = os.environ.get("SUPABASE_URL")
-        key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+        url = (os.environ.get("SUPABASE_URL") or "").strip()
+        key = (os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
+ 
         if not url or not key:
             raise RuntimeError(
                 "環境変数 SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY が設定されていません"
